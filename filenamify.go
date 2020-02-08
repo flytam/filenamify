@@ -1,6 +1,7 @@
 package filenamify
 
 import (
+	"errors"
 	"math"
 	"path/filepath"
 	"regexp"
@@ -33,7 +34,7 @@ func Filenamify(str string, options Options) (string, error) {
 	}
 
 	if filenameReservedRegex.MatchString(replacement) && reControlCharsRegex.MatchString(replacement) {
-		return "", e{"Replacement string cannot contain reserved filename characters"}
+		return "", errors.New("Replacement string cannot contain reserved filename characters")
 	}
 
 	// reserved word
@@ -103,12 +104,4 @@ func stripOuter(input string, substring string) string {
 	substring = escapeStringRegexp(substring)
 	reg := regexp.MustCompile(`^` + substring + `|` + substring + `$`)
 	return reg.ReplaceAllString(input, "")
-}
-
-type e struct {
-	message string
-}
-
-func (e e) Error() string {
-	return e.message
 }
