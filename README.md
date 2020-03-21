@@ -1,5 +1,8 @@
 ## go-filenamify
 
+
+[![Build Status](https://travis-ci.com/flytam/filenamify.svg?branch=master)](https://travis-ci.com/flytam/filenamify)
+
 Convert a string to a valid safe filename
 
 #### Installation
