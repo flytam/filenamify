@@ -35,6 +35,17 @@ func main() {
     	Replacement:"🐴",
     })
     fmt.Println(output,err) // => foo🐴bar,nil
+
+
+	output,err =filenamify.FilenamifyV2(`<foo/bar>`)
+    fmt.Println(output,err) // => foo!bar,nil
+
+    //---
+    output,err =filenamify.FilenamifyV2(`foo:"bar"`,func(options *Options) {
+		options.Replacement = "🐴"
+	})
+    fmt.Println(output,err) // => foo🐴bar,nil
+
 }
 
 
@@ -55,6 +66,9 @@ type Options struct {
 	MaxLength int// default: 100
 }
 ```
+FilenamifyV2 and  PathV2 are added in v1.1.0
+- `func FilenamifyV2(str string, optFuns ...func(options *Options)) (string, error)`
+- `func PathV2(str string, optFuns ...func(options *Options)) (string, error)`
 
 #### Related
 

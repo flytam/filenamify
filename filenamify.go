@@ -71,6 +71,17 @@ func Filenamify(str string, options Options) (string, error) {
 	return string(strBuf), nil
 }
 
+func FilenamifyV2(str string, optFuns ...func(options *Options)) (string, error) {
+	options := Options{
+		Replacement: "!",
+		MaxLength:   MAX_FILENAME_LENGTH,
+	}
+	for _, fn := range optFuns {
+		fn(&options)
+	}
+	return Filenamify(str, options)
+}
+
 func Path(filePath string, options Options) (string, error) {
 	p, err := filepath.Abs(filePath)
 	if err != nil {
@@ -83,6 +94,17 @@ func Path(filePath string, options Options) (string, error) {
 	}
 
 	return filepath.Join(filepath.Dir(p), p), nil
+}
+
+func PathV2(str string, optFuns ...func(options *Options)) (string, error) {
+	options := Options{
+		Replacement: "!",
+		MaxLength:   MAX_FILENAME_LENGTH,
+	}
+	for _, fn := range optFuns {
+		fn(&options)
+	}
+	return Path(str, options)
 }
 
 func escapeStringRegexp(str string) string {

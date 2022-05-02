@@ -69,14 +69,40 @@ func TestFilenamify(t *testing.T) {
 
 }
 
+func TestFilenamifyV2(t *testing.T) {
+	var output string
+
+	input := "c/n"
+	expect := "cconn"
+
+	if output, _ = FilenamifyV2(input, func(options *Options) {
+		options.Replacement = "con"
+	}); output != expect {
+		t.Error("expect:", expect, "got:", output)
+	} else {
+		t.Log("pass")
+	}
+
+}
+
 func TestFilenamifyPath(t *testing.T) {
 	expect := "foo!bar"
+	expect2 := "foohbar"
 	inputStr, _ := filepath.Abs("foo:bar")
 
 	if output, _ := Path(inputStr, Options{}); filepath.Base(output) != expect {
 		t.Error("TestFilenamifyPath error", filepath.Base(output), expect)
 	}
 
+	if output, _ := PathV2(inputStr); filepath.Base(output) != expect {
+		t.Error("TestFilenamifyPath error", filepath.Base(output), expect)
+	}
+
+	if output, _ := PathV2(inputStr, func(options *Options) {
+		options.Replacement = "h"
+	}); filepath.Base(output) != expect2 {
+		t.Error("TestFilenamifyPath error", filepath.Base(output), expect2)
+	}
 }
 
 func TestFilenamifyLength(t *testing.T) {
