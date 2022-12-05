@@ -16,7 +16,6 @@ type Options struct {
 
 const MAX_FILENAME_LENGTH = 100
 
-// func Filenamify(str string, options Options) (string, error) {
 func FilenamifyV2(str string, optFuns ...func(options *Options)) (string, error) {
 	options := Options{
 		Replacement: "!", // default remains the same
@@ -74,7 +73,6 @@ func FilenamifyV2(str string, optFuns ...func(options *Options)) (string, error)
 	return string(strBuf), nil
 }
 
-// func FilenamifyV2(str string, optFuns ...func(options *Options)) (string, error) {
 func Filenamify(str string, options Options) (string, error) {
 	return FilenamifyV2(str, genFuncFromOptions(options))
 }
@@ -133,4 +131,3 @@ func genFuncFromOptions(options Options) func(*Options) {
 	}
 	return optFun
 }
-
