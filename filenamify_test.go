@@ -61,7 +61,7 @@ func TestFilenamify(t *testing.T) {
 
 	for index, item := range example {
 		if output, _ = Filenamify(item.input.str, item.input.options); output != item.output {
-			t.Error(index, item.input.str, item.input.options, item.output)
+			t.Errorf("i:%d input: %v, opt:%v, expect:%v, got:%v", index, item.input.str, item.input.options, item.output, output)
 		} else {
 			t.Log(index, "pass")
 		}
@@ -83,6 +83,25 @@ func TestFilenamifyV2(t *testing.T) {
 		t.Log("pass")
 	}
 
+	// test default replacement with no function
+	expect = "c!n"
+	if output, _ = FilenamifyV2(input); output != expect {
+		t.Error("expect:", expect, "got:", output)
+	} else {
+		t.Log("pass")
+	}
+
+	// test blank replacement
+	expect = "foobar"
+	for idx, inp := range []string{"foo<bar", "foo>bar", "foo:bar", "foo\"bar", "foo/bar", "foo\\bar",
+		"foo|bar", "foo?bar", "foo*bar"} {
+		output, _ = FilenamifyV2(inp, func(options *Options) { options.Replacement = "" })
+		if output != expect {
+			t.Errorf("%v: expect:'%v' got:'%v'", idx, expect, output)
+		} else {
+			t.Logf("%v: pass", idx)
+		}
+	}
 }
 
 func TestFilenamifyPath(t *testing.T) {

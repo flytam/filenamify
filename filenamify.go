@@ -16,8 +16,16 @@ type Options struct {
 
 const MAX_FILENAME_LENGTH = 100
 
-func Filenamify(str string, options Options) (string, error) {
-	var replacement string
+func FilenamifyV2(str string, optFuns ...func(options *Options)) (string, error) {
+	options := Options{
+		Replacement: "!", // default remains the same
+		MaxLength:   MAX_FILENAME_LENGTH,
+	}
+	for _, fn := range optFuns {
+		fn(&options)
+	}
+
+	var replacement = options.Replacement
 
 	reControlCharsRegex := regexp.MustCompile("[\u0000-\u001f\u0080-\u009f]")
 
@@ -27,14 +35,8 @@ func Filenamify(str string, options Options) (string, error) {
 	filenameReservedRegex := regexp.MustCompile(`[<>:"/\\|?*\x00-\x1F]`)
 	filenameReservedWindowsNamesRegex := regexp.MustCompile(`(?i)^(con|prn|aux|nul|com[0-9]|lpt[0-9])$`)
 
-	if options.Replacement == "" {
-		replacement = "!"
-	} else {
-		replacement = options.Replacement
-	}
-
 	if filenameReservedRegex.MatchString(replacement) && reControlCharsRegex.MatchString(replacement) {
-		return "", errors.New("Replacement string cannot contain reserved filename characters")
+		return "", errors.New("replacement string cannot contain reserved filename characters")
 	}
 
 	// reserved word
@@ -71,24 +73,17 @@ func Filenamify(str string, options Options) (string, error) {
 	return string(strBuf), nil
 }
 
-func FilenamifyV2(str string, optFuns ...func(options *Options)) (string, error) {
-	options := Options{
-		Replacement: "!",
-		MaxLength:   MAX_FILENAME_LENGTH,
-	}
-	for _, fn := range optFuns {
-		fn(&options)
-	}
-	return Filenamify(str, options)
+func Filenamify(str string, options Options) (string, error) {
+	return FilenamifyV2(str, genFuncFromOptions(options))
 }
 
-func Path(filePath string, options Options) (string, error) {
+func PathV2(filePath string, optFuns ...func(options *Options)) (string, error) {
 	p, err := filepath.Abs(filePath)
 	if err != nil {
 		return "", err
 	}
 
-	p, err = Filenamify(filepath.Base(p), options)
+	p, err = FilenamifyV2(filepath.Base(p), optFuns...)
 	if err != nil {
 		return "", err
 	}
@@ -96,15 +91,8 @@ func Path(filePath string, options Options) (string, error) {
 	return filepath.Join(filepath.Dir(p), p), nil
 }
 
-func PathV2(str string, optFuns ...func(options *Options)) (string, error) {
-	options := Options{
-		Replacement: "!",
-		MaxLength:   MAX_FILENAME_LENGTH,
-	}
-	for _, fn := range optFuns {
-		fn(&options)
-	}
-	return Path(str, options)
+func Path(filePath string, options Options) (string, error) {
+	return PathV2(filePath, genFuncFromOptions(options))
 }
 
 func escapeStringRegexp(str string) string {
@@ -126,4 +114,20 @@ func stripOuter(input string, substring string) string {
 	substring = escapeStringRegexp(substring)
 	reg := regexp.MustCompile(`^` + substring + `|` + substring + `$`)
 	return reg.ReplaceAllString(input, "")
+}
+
+func genFuncFromOptions(options Options) func(*Options) {
+	var optFun = func(opt *Options) {
+		if options.Replacement != "" {
+			opt.Replacement = options.Replacement
+		}
+		if options.MaxLength > 0 {
+			opt.MaxLength = options.MaxLength
+		} else {
+			opt.MaxLength = MAX_FILENAME_LENGTH
+		}
+
+		opt = &options
+	}
+	return optFun
 }
