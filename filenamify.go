@@ -67,7 +67,7 @@ func FilenamifyV2(str string, optFuns ...func(options *Options)) (string, error)
 	} else {
 		limitLength = MAX_FILENAME_LENGTH
 	}
-	strBuf := []byte(str)
+	strBuf := []rune(str)
 	strBuf = strBuf[0:int(math.Min(float64(limitLength), float64(len(strBuf))))]
 
 	return string(strBuf), nil

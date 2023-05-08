@@ -136,4 +136,13 @@ func TestFilenamifyLength(t *testing.T) {
 		t.Error("TestFilenamifyLength error")
 	}
 
+	// test max length with non-ASCII characters
+	expect := "你好"
+	input := "你好，世界！"
+	output, _ := FilenamifyV2(input, func(options *Options) { options.MaxLength = 2 })
+	if output != expect {
+		t.Errorf("expect:'%v' got:'%v'", expect, output)
+	} else {
+		t.Log("pass")
+	}
 }
