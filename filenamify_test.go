@@ -146,3 +146,9 @@ func TestFilenamifyLength(t *testing.T) {
 		t.Log("pass")
 	}
 }
+
+func BenchmarkFilenameifyV2(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		FilenamifyV2("Hello world!")
+	}
+}
