@@ -124,6 +124,19 @@ func TestFilenamifyPath(t *testing.T) {
 	}
 }
 
+func TestFilenamifyPathWindowsName(t *testing.T) {
+	expect := "com2!"
+	inputStr, _ := filepath.Abs("com2")
+
+	if output, _ := Path(inputStr, Options{}); filepath.Base(output) != expect {
+		t.Error("TestFilenamifyPath error", filepath.Base(output), expect)
+	}
+
+	if output, _ := PathV2(inputStr); filepath.Base(output) != expect {
+		t.Error("TestFilenamifyPath error", filepath.Base(output), expect)
+	}
+}
+
 func TestFilenamifyLength(t *testing.T) {
 	// Basename length: 152
 	const filename = "this/is/a/very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_very_long_filename.txt"
